@@ -1,3 +1,40 @@
 package main
 
-func main() {}
+import (
+	"context"
+	"gophermart/api/rest"
+	"gophermart/api/rest/handler"
+	"gophermart/pkg/config"
+	"gophermart/pkg/logger"
+	v1 "gophermart/service/v1"
+	"gophermart/storage/pgsql"
+	"os"
+	"os/signal"
+	"syscall"
+)
+
+func main() {
+	ctx, ctxCancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer ctxCancel()
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		logger.GetLogger().Errorf("init config error, %v", err)
+		os.Exit(1)
+	}
+
+	stg, err := pgsql.NewStorage(cfg)
+	if err != nil {
+		logger.GetLogger().Errorf("init config error, %v", err)
+		os.Exit(1)
+	}
+
+	userService := v1.NewUserService(stg)
+	hr := handler.NewHandler(handler.WithUserService(userService))
+
+	server := rest.NewAPIServer(hr, cfg.RunAddress)
+	server.Run(ctx)
+
+	<-ctx.Done()
+	logger.GetLogger().Info("shutting down server")
+}
