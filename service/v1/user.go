@@ -28,17 +28,17 @@ func (s UserService) Create(ctx context.Context, login, password string) error {
 		logger.GetLogger().Error(err)
 		return err
 	}
-	_, err = s.userStorage.GetByLogin(ctx, login)
+	_, err = s.userStorage.GetUserByLogin(ctx, login)
 	if err == nil {
 		return errs.ErrLoginExists
 	}
 
-	return s.userStorage.Create(ctx, login, password)
+	return s.userStorage.CreateUser(ctx, login, password)
 }
 
 // Auth user.
 func (s UserService) Auth(ctx context.Context, login, password string) (string, error) {
-	user, err := s.userStorage.GetByLogin(ctx, login)
+	user, err := s.userStorage.GetUserByLogin(ctx, login)
 	if err != nil {
 		logger.GetLogger().Info(err)
 		return "", errs.ErrAuthFailed

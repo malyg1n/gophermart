@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/go-chi/chi/v5"
 	"gophermart/api/rest/middleware"
-	"net/http"
 )
 
 // GetRouter returns router.
@@ -16,11 +15,13 @@ func (h Handler) GetRouter() chi.Router {
 	router.Post("/api/user/register", h.Register)
 	router.Post("/api/user/login", h.Login)
 
-	router.Route("/api/order", func(r chi.Router) {
+	router.Route("/api/user/orders", func(r chi.Router) {
 		r = r.With(middleware.Auth)
-		r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(202)
-		})
+		r.Post("/", h.CreateOrder)
+	})
+
+	router.Route("/api/user/balance", func(r chi.Router) {
+		r = r.With(middleware.Auth)
 	})
 
 	return router

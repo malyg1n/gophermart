@@ -6,7 +6,8 @@ import (
 
 // Handler base handler struct.
 type Handler struct {
-	userService service.IUserService
+	userService  service.IUserService
+	orderService service.IOrderService
 }
 
 // Option for Handler.
@@ -27,5 +28,12 @@ func NewHandler(opts ...Option) *Handler {
 func WithUserService(sv service.IUserService) Option {
 	return func(handler *Handler) {
 		handler.userService = sv
+	}
+}
+
+// WithOrderService option.
+func WithOrderService(sv service.IOrderService) Option {
+	return func(handler *Handler) {
+		handler.orderService = sv
 	}
 }

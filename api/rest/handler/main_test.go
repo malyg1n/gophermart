@@ -21,7 +21,7 @@ func (s *Suite) SetupTest() {
 	cfg, _ := config.GetConfig()
 	cfg.DatabaseURI = "postgres://forge:secret@localhost:54321/gophermart?sslmode=disable"
 	st, _ := pgsql.NewStorage(cfg)
-	st.Clear()
+	st.Drop()
 	us := v1.NewUserService(st)
 	s.handler = NewHandler(WithUserService(us))
 }
