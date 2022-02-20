@@ -1,9 +1,11 @@
 package service
 
-import "gophermart/model"
+import (
+	"context"
+)
 
 // IUserService interface for operations with users.
 type IUserService interface {
-	Create(login, password string) (*model.User, error)
-	Auth(login, password string) error
+	Create(ctx context.Context, login, password string) error
+	Auth(ctx context.Context, login, password string) (string, error)
 }

@@ -19,13 +19,13 @@ func main() {
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		logger.GetLogger().Errorf("init config error, %v", err)
+		logger.GetLogger().Errorw("config error", "error", err.Error())
 		os.Exit(1)
 	}
 
 	stg, err := pgsql.NewStorage(cfg)
 	if err != nil {
-		logger.GetLogger().Errorf("init config error, %v", err)
+		logger.GetLogger().Errorw("storage error", "error", err.Error())
 		os.Exit(1)
 	}
 

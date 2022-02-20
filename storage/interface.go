@@ -1,9 +1,12 @@
 package storage
 
-import "gophermart/model"
+import (
+	"context"
+	"gophermart/model"
+)
 
 // IUserStorage interface for operations with users.
 type IUserStorage interface {
-	Create(login, password string) error
-	GetByLogin(login string) (*model.User, error)
+	Create(ctx context.Context, login, password string) error
+	GetByLogin(ctx context.Context, login string) (*model.User, error)
 }

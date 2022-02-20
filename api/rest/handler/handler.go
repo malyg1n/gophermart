@@ -1,12 +1,15 @@
 package handler
 
-import "gophermart/service"
+import (
+	"gophermart/service"
+)
 
 // Handler base handler struct.
 type Handler struct {
 	userService service.IUserService
 }
 
+// Option for Handler.
 type Option func(handler *Handler)
 
 // NewHandler returns Handler instance.
