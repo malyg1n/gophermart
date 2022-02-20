@@ -20,7 +20,7 @@ func (s *Suite) TestHandlerRegister() {
 			name:           "valid",
 			payload:        strings.NewReader(`{"login": "test", "password": "secret"}`),
 			exceptedStatus: 200,
-			exceptedHeader: "Authentication",
+			exceptedHeader: "Authorization",
 		},
 		{
 			name:           "exists login",
@@ -63,7 +63,7 @@ func (s *Suite) TestHandlerLogin() {
 			name:           "valid",
 			payload:        strings.NewReader(`{"login": "test", "password": "secret"}`),
 			exceptedStatus: 200,
-			exceptedHeader: "Authentication",
+			exceptedHeader: "Authorization",
 		},
 		{
 			name:           "invalid login",

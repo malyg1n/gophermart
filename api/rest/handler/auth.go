@@ -77,6 +77,6 @@ func (h Handler) login(w http.ResponseWriter, ctx context.Context, login, passwo
 	}
 
 	w.Header().Set("Content-type", "application/json")
-	w.Header().Set("Authentication", fmt.Sprintf("Bearer %s", token))
+	w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	w.WriteHeader(http.StatusOK)
 }
