@@ -31,12 +31,12 @@ func GetUserIDByToken(tokenString string) (int, error) {
 		return 0, fmt.Errorf("invalid token: %s", tokenString)
 	}
 
-	userID, ok := claims["user_id"].(int)
+	userID, ok := claims["user_id"].(float64)
 	if !ok {
 		return 0, fmt.Errorf("invalid token claims: %s", tokenString)
 	}
 
-	return userID, nil
+	return int(userID), nil
 }
 
 // CreateTokenByUserID returns token string by user.

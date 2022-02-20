@@ -13,10 +13,6 @@ type Storage struct {
 
 // NewStorage returns new storage instance.
 func NewStorage(cfg *config.AppConfig) (*Storage, error) {
-	cfg, err := config.GetConfig()
-	if err != nil {
-		return nil, err
-	}
 	db, err := sqlx.Open("postgres", cfg.DatabaseURI)
 	if err != nil {
 		return nil, err

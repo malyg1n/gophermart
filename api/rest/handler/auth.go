@@ -11,6 +11,7 @@ import (
 	"net/http"
 )
 
+// Register handler.
 func (h Handler) Register(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -44,6 +45,7 @@ func (h Handler) Register(w http.ResponseWriter, r *http.Request) {
 	h.login(w, ctx, req.Login, req.Password)
 }
 
+// Login handler.
 func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
