@@ -18,6 +18,7 @@ func (h Handler) GetRouter() chi.Router {
 	router.Route("/api/user/orders", func(r chi.Router) {
 		r = r.With(middleware.Auth)
 		r.Post("/", h.CreateOrder)
+		r.Get("/", h.GetOrdersByUser)
 	})
 
 	router.Route("/api/user/balance", func(r chi.Router) {

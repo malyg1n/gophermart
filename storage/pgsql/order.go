@@ -6,6 +6,7 @@ import (
 	dbModel "gophermart/storage/pgsql/model"
 )
 
+// CreateOrder makes new order.
 func (s *Storage) CreateOrder(ctx context.Context, number string, userID int) error {
 	_, err := s.db.ExecContext(
 		ctx,
@@ -17,6 +18,7 @@ func (s *Storage) CreateOrder(ctx context.Context, number string, userID int) er
 	return err
 }
 
+// GetOrderByNumber returns order by number.
 func (s *Storage) GetOrderByNumber(ctx context.Context, number string) (*model.Order, error) {
 	var order dbModel.Order
 	query := "select * from orders where id = $1"
@@ -27,6 +29,7 @@ func (s *Storage) GetOrderByNumber(ctx context.Context, number string) (*model.O
 	return order.ToCanonical(), nil
 }
 
+// GetOrdersByUser returns orders by user.
 func (s *Storage) GetOrdersByUser(ctx context.Context, userID int) ([]*model.Order, error) {
 	var orders []*model.Order
 	var dbOrders []*dbModel.Order
@@ -43,6 +46,7 @@ func (s *Storage) GetOrdersByUser(ctx context.Context, userID int) ([]*model.Ord
 	return orders, nil
 }
 
+// UpdateOrder updates order.
 func (s *Storage) UpdateOrder(ctx context.Context, order model.Order) error {
 	_, err := s.db.ExecContext(
 		ctx,

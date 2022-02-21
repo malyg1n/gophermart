@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
+	"gophermart/api/rest/response"
 	"gophermart/pkg/contexts"
 	"gophermart/pkg/errs"
 	"io"
@@ -11,7 +13,6 @@ import (
 // CreateOrder handler.
 func (h Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	var number string
 
 	userID, ok := ctx.Value(contexts.ContextUserKey).(int)
 	if !ok {
@@ -25,8 +26,7 @@ func (h Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	number = string(b)
-
+	number := string(b)
 	err = h.orderService.CreateOrder(ctx, number, userID)
 	if err != nil {
 		if errors.Is(errs.ErrOrderNumber, err) {
@@ -47,4 +47,44 @@ func (h Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusAccepted)
+}
+
+// GetOrdersByUser handler.
+func (h Handler) GetOrdersByUser(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	userID, ok := ctx.Value(contexts.ContextUserKey).(int)
+	if !ok {
+		http.Error(w, "failing with user context", http.StatusInternalServerError)
+		return
+	}
+
+	orders, err := h.orderService.GetOrdersByUser(ctx, userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if len(orders) == 0 {
+		http.Error(w, "orders did not upload", http.StatusNoContent)
+		return
+	}
+
+	responseOrders := make([]response.Order, 0, len(orders))
+	for _, o := range orders {
+		responseOrders = append(responseOrders, response.OrderFromCanonical(o))
+	}
+
+	result, err := json.Marshal(responseOrders)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(result)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

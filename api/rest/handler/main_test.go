@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"gophermart/pkg/config"
+	"gophermart/pkg/token"
 	v1 "gophermart/service/v1"
 	"gophermart/storage/pgsql"
 	"io"
@@ -44,4 +45,13 @@ func (s *Suite) testRequest(method, path string, payload io.Reader, headers map[
 	require.NoError(s.T(), err)
 
 	return resp
+}
+
+func (s *Suite) getAuthHeader(userID int) map[string]string {
+	tkn, err := token.CreateTokenByUserID(userID)
+	require.NoError(s.T(), err)
+
+	return map[string]string{
+		"Authorization": "Bearer " + tkn,
+	}
 }
