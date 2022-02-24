@@ -22,7 +22,7 @@ func NewOrderService(st storage.IOrderStorage) OrderService {
 
 // CreateOrder makes new order.
 func (s OrderService) CreateOrder(ctx context.Context, number string, userID int) error {
-	if number == "" || !validation.IsLunh(number) {
+	if number == "" || validation.IsLunh(number) == false {
 		return errs.ErrOrderNumber
 	}
 

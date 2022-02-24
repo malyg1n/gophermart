@@ -24,7 +24,8 @@ func (s *Suite) SetupTest() {
 	st, _ := pgsql.NewStorage(cfg)
 	st.Drop()
 	us := v1.NewUserService(st)
-	s.handler = NewHandler(WithUserService(us))
+	os := v1.NewOrderService(st)
+	s.handler = NewHandler(WithUserService(us), WithOrderService(os))
 }
 
 func TestHandlers(t *testing.T) {
