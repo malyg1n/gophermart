@@ -19,18 +19,22 @@ func main() {
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		logger.GetLogger().Errorf("init config error, %v", err)
+		logger.GetLogger().Errorw("config error", "error", err.Error())
 		os.Exit(1)
 	}
 
 	stg, err := pgsql.NewStorage(cfg)
 	if err != nil {
-		logger.GetLogger().Errorf("init config error, %v", err)
+		logger.GetLogger().Errorw("storage error", "error", err.Error())
 		os.Exit(1)
 	}
 
 	userService := v1.NewUserService(stg)
-	hr := handler.NewHandler(handler.WithUserService(userService))
+	orderService := v1.NewOrderService(stg)
+	hr := handler.NewHandler(
+		handler.WithUserService(userService),
+		handler.WithOrderService(orderService),
+	)
 
 	server := rest.NewAPIServer(hr, cfg.RunAddress)
 	server.Run(ctx)

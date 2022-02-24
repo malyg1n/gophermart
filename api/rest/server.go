@@ -17,7 +17,7 @@ type APIServer struct {
 func NewAPIServer(handler *handler.Handler, addr string) *APIServer {
 	server := &APIServer{
 		handler: handler,
-		server:  &http.Server{Addr: addr},
+		server:  &http.Server{Addr: addr, Handler: handler.GetRouter()},
 	}
 
 	return server
@@ -25,7 +25,6 @@ func NewAPIServer(handler *handler.Handler, addr string) *APIServer {
 
 // Run HTTP server.
 func (srv *APIServer) Run(ctx context.Context) error {
-	srv.server.Handler = nil
 	go func() {
 		logger.GetLogger().Infow("server started", "addr", srv.server.Addr)
 		_ = srv.server.ListenAndServe()
