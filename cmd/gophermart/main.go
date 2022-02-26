@@ -29,8 +29,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	userService := v1.NewUserService(stg)
-	orderService := v1.NewOrderService(stg)
+	userService := v1.NewUserService(stg, stg)
+	orderService := v1.NewOrderService(stg, stg)
+
 	hr := handler.NewHandler(
 		handler.WithUserService(userService),
 		handler.WithOrderService(orderService),

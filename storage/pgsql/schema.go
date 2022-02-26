@@ -20,6 +20,7 @@ create table if not exists orders (
 create table if not exists transactions (
     id bigserial not null,
     user_id integer not null,
+    order_id varchar (255) not null,
     amount decimal (16, 2),
     created_at timestamp(0) with time zone not null default current_timestamp
 );
@@ -32,7 +33,7 @@ func (s Storage) Migrate() error {
 	return err
 }
 
-func (s Storage) Drop() {
+func (s Storage) Truncate() {
 	s.db.Exec("truncate table transactions;")
 	s.db.Exec("truncate table orders;")
 	s.db.Exec("truncate table users;")

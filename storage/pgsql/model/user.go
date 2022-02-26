@@ -17,5 +17,7 @@ func (u User) ToCanonical() *model.User {
 		ID:            u.ID,
 		Login:         u.Login,
 		CryptPassword: u.Password,
+		Balance:       u.Balance,
+		Outcome:       u.Outcome,
 	}
 }

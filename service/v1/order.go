@@ -10,13 +10,15 @@ import (
 
 // OrderService struct.
 type OrderService struct {
-	storage storage.IOrderStorage
+	orderStorage       storage.IOrderStorage
+	transactionStorage storage.ITransactionStorage
 }
 
 // NewOrderService constructor.
-func NewOrderService(st storage.IOrderStorage) OrderService {
+func NewOrderService(os storage.IOrderStorage, ts storage.ITransactionStorage) OrderService {
 	return OrderService{
-		storage: st,
+		orderStorage:       os,
+		transactionStorage: ts,
 	}
 }
 
@@ -26,7 +28,7 @@ func (s OrderService) CreateOrder(ctx context.Context, number string, userID int
 		return errs.ErrOrderNumber
 	}
 
-	order, err := s.storage.GetOrderByNumber(ctx, number)
+	order, err := s.orderStorage.GetOrderByNumber(ctx, number)
 	if err == nil {
 		if order.UserID == userID {
 			return errs.ErrOrderCreatedByMyself
@@ -34,17 +36,17 @@ func (s OrderService) CreateOrder(ctx context.Context, number string, userID int
 		return errs.ErrOrderExists
 	}
 
-	return s.storage.CreateOrder(ctx, number, userID)
+	return s.orderStorage.CreateOrder(ctx, number, userID)
 }
 
 // GetOrderByNumber returns order by number.
 func (s OrderService) GetOrderByNumber(ctx context.Context, number string) (*model.Order, error) {
-	return s.storage.GetOrderByNumber(ctx, number)
+	return s.orderStorage.GetOrderByNumber(ctx, number)
 }
 
 // GetOrdersByUser returns orders by user.
 func (s OrderService) GetOrdersByUser(ctx context.Context, userID int) ([]*model.Order, error) {
-	return s.storage.GetOrdersByUser(ctx, userID)
+	return s.orderStorage.GetOrdersByUser(ctx, userID)
 }
 
 // UpdateOrder updates order.

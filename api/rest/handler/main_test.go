@@ -6,6 +6,7 @@ import (
 	"gophermart/pkg/config"
 	"gophermart/pkg/token"
 	v1 "gophermart/service/v1"
+	"gophermart/storage"
 	"gophermart/storage/pgsql"
 	"io"
 	"net/http"
@@ -16,16 +17,22 @@ import (
 type Suite struct {
 	suite.Suite
 	handler *Handler
+	us      storage.IUserStorage
+	os      storage.IOrderStorage
+	ts      storage.ITransactionStorage
 }
 
 func (s *Suite) SetupTest() {
 	cfg, _ := config.GetConfig()
 	cfg.DatabaseURI = "postgres://forge:secret@localhost:54321/gophermart?sslmode=disable"
 	st, _ := pgsql.NewStorage(cfg)
-	st.Drop()
-	us := v1.NewUserService(st)
-	os := v1.NewOrderService(st)
+	st.Truncate()
+	us := v1.NewUserService(st, st)
+	os := v1.NewOrderService(st, st)
 	s.handler = NewHandler(WithUserService(us), WithOrderService(os))
+	s.us = st
+	s.os = st
+	s.ts = st
 }
 
 func TestHandlers(t *testing.T) {

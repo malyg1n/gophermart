@@ -28,3 +28,14 @@ func (s *Storage) GetUserByLogin(ctx context.Context, login string) (*model.User
 
 	return user.ToCanonical(), nil
 }
+
+// GetUserByID returns user by login
+func (s *Storage) GetUserByID(ctx context.Context, id int) (*model.User, error) {
+	var user dbModel.User
+	query := "select * from users where id = $1"
+	if err := s.db.GetContext(ctx, &user, query, id); err != nil {
+		return nil, err
+	}
+
+	return user.ToCanonical(), nil
+}

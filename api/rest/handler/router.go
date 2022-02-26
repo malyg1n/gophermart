@@ -23,6 +23,9 @@ func (h Handler) GetRouter() chi.Router {
 
 	router.Route("/api/user/balance", func(r chi.Router) {
 		r = r.With(middleware.Auth)
+		r.Get("/", h.ShowBalance)
+		r.Get("/withdrawals", h.Withdrawals)
+		r.Post("/withdraw", h.Withdraw)
 	})
 
 	return router
