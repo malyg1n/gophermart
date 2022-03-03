@@ -23,7 +23,9 @@ func NewAccrualHttpProvider(addr string) HttpProvider {
 func (p HttpProvider) CheckOrder(orderID string) (*model.Order, error) {
 	client := &http.Client{}
 	resp, err := client.Get(p.addr + "/api/order/" + orderID)
-	defer resp.Body.Close()
+	defer func() {
+		resp.Body.Close()
+	}()
 
 	if err != nil {
 		return nil, err

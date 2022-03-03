@@ -32,7 +32,7 @@ func GetConfig() (*AppConfig, error) {
 	viper.AutomaticEnv()
 	pflag.StringP(dbURIName, "d", "", "database connection string")
 	pflag.StringP(RunAddrName, "a", "localhost:8080", "run address")
-	pflag.StringP(AccrualAddrName, "r", "localhost:8081", "accrual system address")
+	pflag.StringP(AccrualAddrName, "r", "http://localhost:8081", "accrual system address")
 	pflag.StringP(AppSecretName, "k", "app-secret-key", "secret key for app")
 	pflag.Parse()
 	err := viper.BindPFlags(pflag.CommandLine)

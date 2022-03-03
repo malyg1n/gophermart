@@ -78,8 +78,11 @@ func (s OrderService) processOrder(ctx context.Context, orderID string) error {
 	// 100 tries to check order
 	for i < 100 {
 		order, err := provider.CheckOrder(orderID)
-		if err != nil && errors.Is(errs.ErrToManyRequests, err) {
-			time.Sleep(time.Second * 60)
+		logger.GetLogger().Error(err)
+		if err != nil {
+			if errors.Is(errs.ErrToManyRequests, err) {
+				time.Sleep(time.Second * 60)
+			}
 			continue
 		}
 		if status != order.Status {
