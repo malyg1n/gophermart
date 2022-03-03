@@ -3,8 +3,10 @@ package v1
 import (
 	"context"
 	"gophermart/model"
+	"gophermart/pkg/config"
 	"gophermart/pkg/errs"
 	"gophermart/pkg/validation"
+	"gophermart/provider/accrual"
 	"gophermart/storage"
 )
 
@@ -49,7 +51,20 @@ func (s OrderService) GetOrdersByUser(ctx context.Context, userID int) ([]*model
 	return s.orderStorage.GetOrdersByUser(ctx, userID)
 }
 
-// UpdateOrder updates order.
-func (s OrderService) UpdateOrder(ctx context.Context, number, status string, accrual float64) error {
+// updateOrder updates order.
+func (s OrderService) updateOrder(ctx context.Context, number, status string, accrual float64) error {
 	return nil
+}
+
+func (s OrderService) processOrder(ctx context.Context, orderID string) error {
+	var i int
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return err
+	}
+	provider := accrual.NewAccrualHttpProvider(cfg.AccrualAddress)
+	for i < 100 {
+		order, err := provider
+		i++
+	}
 }
