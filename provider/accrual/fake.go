@@ -15,11 +15,20 @@ func NewFakeHTTProvider() FakeHTTProvider {
 
 // CheckOrder in accrual system.
 func (p FakeHTTProvider) CheckOrder(orderID string) (*model.Order, error) {
-	order := &model.Order{
-		Number:  orderID,
-		Status:  "PROCESSED",
-		Accrual: 500,
+	var status string
+	var accrual float64
+	switch orderID {
+	case "12345678903001":
+		status = "PROCESSED"
+		accrual = 500
+	default:
+		status = "PROCESSING"
+		accrual = 0
 	}
 
-	return order, nil
+	return &model.Order{
+		Number:  orderID,
+		Status:  status,
+		Accrual: accrual,
+	}, nil
 }

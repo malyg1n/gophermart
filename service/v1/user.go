@@ -59,16 +59,6 @@ func (s UserService) GetTransactions(ctx context.Context, userID int) ([]*model.
 	return transactions, err
 }
 
-// TopUp user balance.
-func (s UserService) TopUp(ctx context.Context, userID int, orderID string, amount float64) error {
-	err := s.transactionStorage.SaveTransaction(ctx, userID, orderID, amount)
-	if err != nil {
-		s.logger.Errorf("%v", err)
-	}
-
-	return err
-}
-
 // Withdraw money from user.
 func (s UserService) Withdraw(ctx context.Context, userID int, orderID string, sum float64) error {
 	user, err := s.userStorage.GetUserByID(ctx, userID)

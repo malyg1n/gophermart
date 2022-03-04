@@ -17,7 +17,6 @@ func (s *OrderService) CreateOrder(ctx context.Context, number string, userID in
 
 	order, err := s.orderStorage.GetOrderByNumber(ctx, number)
 	if err == nil {
-		s.logger.Errorf("%v", err)
 		if order.UserID == userID {
 			return errs.ErrOrderCreatedByMyself
 		}

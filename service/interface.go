@@ -13,7 +13,6 @@ type IUserService interface {
 	ShowBalance(ctx context.Context, userID int) (*response.Balance, error)
 	GetTransactions(ctx context.Context, userID int) ([]*model.Transaction, error)
 	Withdraw(ctx context.Context, userID int, orderID string, sum float64) error
-	TopUp(ctx context.Context, userID int, orderID string, amount float64) error
 }
 
 // IOrderService interface for operations with orders.
