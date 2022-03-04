@@ -41,7 +41,7 @@ func (h Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "order already uploaded", http.StatusConflict)
 			return
 		}
-
+		h.logger.Errorf("%v", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -62,6 +62,7 @@ func (h Handler) GetOrdersByUser(w http.ResponseWriter, r *http.Request) {
 	orders, err := h.orderService.GetOrdersByUser(ctx, userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -78,6 +79,7 @@ func (h Handler) GetOrdersByUser(w http.ResponseWriter, r *http.Request) {
 	result, err := json.Marshal(responseOrders)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -85,6 +87,7 @@ func (h Handler) GetOrdersByUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(result)
 	if err != nil {
+		h.logger.Errorf("%v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

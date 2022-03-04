@@ -6,30 +6,14 @@ import (
 	"gophermart/api/rest/response"
 	"gophermart/model"
 	"gophermart/pkg/errs"
-	"gophermart/pkg/logger"
 	"gophermart/pkg/token"
-	"gophermart/storage"
 )
-
-// UserService for working with users.
-type UserService struct {
-	userStorage        storage.IUserStorage
-	transactionStorage storage.ITransactionStorage
-}
-
-// NewUserService creates service instance.
-func NewUserService(us storage.IUserStorage, ts storage.ITransactionStorage) UserService {
-	return UserService{
-		userStorage:        us,
-		transactionStorage: ts,
-	}
-}
 
 // Create user.
 func (s UserService) Create(ctx context.Context, login, password string) error {
 	password, err := s.cryptPassword(password)
 	if err != nil {
-		logger.GetLogger().Error(err)
+		s.logger.Errorf("%v", err)
 		return err
 	}
 	_, err = s.userStorage.GetUserByLogin(ctx, login)
@@ -44,11 +28,11 @@ func (s UserService) Create(ctx context.Context, login, password string) error {
 func (s UserService) Auth(ctx context.Context, login, password string) (string, error) {
 	user, err := s.userStorage.GetUserByLogin(ctx, login)
 	if err != nil {
-		logger.GetLogger().Info(err)
+		s.logger.Infof("%v", err)
 		return "", errs.ErrAuthFailed
 	}
 	if err = s.comparePassword(password, user.CryptPassword); err != nil {
-		logger.GetLogger().Info(err)
+		s.logger.Infof("%v", err)
 		return "", errs.ErrAuthFailed
 	}
 
@@ -59,6 +43,7 @@ func (s UserService) Auth(ctx context.Context, login, password string) (string, 
 func (s UserService) ShowBalance(ctx context.Context, userID int) (*response.Balance, error) {
 	user, err := s.userStorage.GetUserByID(ctx, userID)
 	if err != nil {
+		s.logger.Errorf("%v", err)
 		return nil, err
 	}
 
@@ -67,18 +52,28 @@ func (s UserService) ShowBalance(ctx context.Context, userID int) (*response.Bal
 
 // GetTransactions by user
 func (s UserService) GetTransactions(ctx context.Context, userID int) ([]*model.Transaction, error) {
-	return s.transactionStorage.GetOutcomeTransactionsByUser(ctx, userID)
+	transactions, err := s.transactionStorage.GetOutcomeTransactionsByUser(ctx, userID)
+	if err != nil {
+		s.logger.Infof("%v", err)
+	}
+	return transactions, err
 }
 
 // TopUp user balance.
 func (s UserService) TopUp(ctx context.Context, userID int, orderID string, amount float64) error {
-	return s.transactionStorage.SaveTransaction(ctx, userID, orderID, amount)
+	err := s.transactionStorage.SaveTransaction(ctx, userID, orderID, amount)
+	if err != nil {
+		s.logger.Errorf("%v", err)
+	}
+
+	return err
 }
 
 // Withdraw money from user.
 func (s UserService) Withdraw(ctx context.Context, userID int, orderID string, sum float64) error {
 	user, err := s.userStorage.GetUserByID(ctx, userID)
 	if err != nil {
+		s.logger.Errorf("%v", err)
 		return err
 	}
 	if user.Balance < sum {
@@ -87,12 +82,19 @@ func (s UserService) Withdraw(ctx context.Context, userID int, orderID string, s
 
 	sum = sum * -1
 
-	return s.transactionStorage.SaveTransaction(ctx, userID, orderID, sum)
+	err = s.transactionStorage.SaveTransaction(ctx, userID, orderID, sum)
+	if err != nil {
+		s.logger.Errorf("%v", err)
+		return err
+	}
+
+	return nil
 }
 
 func (s UserService) cryptPassword(password string) (string, error) {
 	crypt, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
+		s.logger.Errorf("%v", err)
 		return "", err
 	}
 
@@ -100,5 +102,10 @@ func (s UserService) cryptPassword(password string) (string, error) {
 }
 
 func (s UserService) comparePassword(password, cryptPassword string) error {
-	return bcrypt.CompareHashAndPassword([]byte(cryptPassword), []byte(password))
+	err := bcrypt.CompareHashAndPassword([]byte(cryptPassword), []byte(password))
+	if err != nil {
+		s.logger.Errorf("%v", err)
+	}
+
+	return err
 }

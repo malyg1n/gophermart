@@ -6,6 +6,7 @@ import (
 	"gophermart/api/rest/handler"
 	"gophermart/pkg/config"
 	"gophermart/pkg/logger"
+	"gophermart/provider/accrual"
 	v1 "gophermart/service/v1"
 	"gophermart/storage/pgsql"
 	"os"
@@ -29,12 +30,26 @@ func main() {
 		os.Exit(1)
 	}
 
-	userService := v1.NewUserService(stg, stg)
-	orderService := v1.NewOrderService(stg, stg)
+	lgr := logger.GetLogger()
+	accrualProvider := accrual.NewAccrualHTTPProvider(cfg.AccrualAddress)
+
+	userService := v1.NewUserService(
+		v1.WithUserStorageUserOption(stg),
+		v1.WithTransactionStorageUserOption(stg),
+		v1.WithLoggerUserOption(lgr),
+	)
+
+	orderService := v1.NewOrderService(
+		v1.WithOrderStorageOrderOption(stg),
+		v1.WithTransactionStorageOrderOption(stg),
+		v1.WithLoggerOrderOption(lgr),
+		v1.WithProviderOrderOption(accrualProvider),
+	)
 
 	hr := handler.NewHandler(
 		handler.WithUserService(userService),
 		handler.WithOrderService(orderService),
+		handler.WithLogger(lgr),
 	)
 
 	server := rest.NewAPIServer(hr, cfg.RunAddress)

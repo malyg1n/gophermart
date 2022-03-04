@@ -7,7 +7,6 @@ import (
 	"gophermart/api/rest/response"
 	"gophermart/pkg/contexts"
 	"gophermart/pkg/errs"
-	"gophermart/pkg/logger"
 	"net/http"
 )
 
@@ -23,14 +22,14 @@ func (h Handler) ShowBalance(w http.ResponseWriter, r *http.Request) {
 	balance, err := h.userService.ShowBalance(ctx, userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.GetLogger().Error(err.Error())
+		h.logger.Errorf("%v", err)
 		return
 	}
 
 	result, err := json.Marshal(balance)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.GetLogger().Error(err.Error())
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -38,7 +37,7 @@ func (h Handler) ShowBalance(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(result)
 	if err != nil {
-		logger.GetLogger().Error(err.Error())
+		h.logger.Errorf("%v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -59,7 +58,7 @@ func (h Handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 
 	if err := dec.Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		logger.GetLogger().Error(err)
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -74,6 +73,7 @@ func (h Handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (h Handler) Withdrawals(w http.ResponseWriter, r *http.Request) {
 	trans, err := h.userService.GetTransactions(ctx, userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.GetLogger().Error(err.Error())
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h Handler) Withdrawals(w http.ResponseWriter, r *http.Request) {
 	result, err := json.Marshal(withdraws)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.GetLogger().Error(err.Error())
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -119,7 +119,7 @@ func (h Handler) Withdrawals(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(result)
 	if err != nil {
-		logger.GetLogger().Error(err.Error())
+		h.logger.Errorf("%v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

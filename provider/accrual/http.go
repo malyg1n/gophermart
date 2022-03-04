@@ -8,20 +8,20 @@ import (
 	"net/http"
 )
 
-// HttpProvider struct.
-type HttpProvider struct {
+// HTTPProvider struct.
+type HTTPProvider struct {
 	addr string
 }
 
-// NewAccrualHttpProvider struct.
-func NewAccrualHttpProvider(addr string) HttpProvider {
-	return HttpProvider{
+// NewAccrualHTTPProvider struct.
+func NewAccrualHTTPProvider(addr string) HTTPProvider {
+	return HTTPProvider{
 		addr: addr,
 	}
 }
 
 // CheckOrder in accrual system.
-func (p HttpProvider) CheckOrder(orderID string) (*model.Order, error) {
+func (p HTTPProvider) CheckOrder(orderID string) (*model.Order, error) {
 	client := &http.Client{}
 	resp, err := client.Get(p.addr + "/api/orders/" + orderID)
 	defer func() {

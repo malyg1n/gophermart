@@ -5,6 +5,10 @@ func IsLunh(number string) bool {
 	var checksum int
 
 	numberLen := len(number)
+	if numberLen == 0 {
+		return false
+	}
+
 	for i := numberLen - 1; i >= 0; i -= 2 {
 		n := number[i] - '0'
 		checksum += int(n)

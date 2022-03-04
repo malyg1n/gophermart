@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"gophermart/api/rest/request"
 	"gophermart/pkg/errs"
-	"gophermart/pkg/logger"
 	"net/http"
 )
 
@@ -21,7 +20,7 @@ func (h Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	if err := dec.Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		logger.GetLogger().Error(err)
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -33,12 +32,11 @@ func (h Handler) Register(w http.ResponseWriter, r *http.Request) {
 	err := h.userService.Create(ctx, req.Login, req.Password)
 	if err != nil {
 		if errors.Is(errs.ErrLoginExists, err) {
-			logger.GetLogger().Info(err)
 			http.Error(w, err.Error(), http.StatusConflict)
 			return
 		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.GetLogger().Error(err)
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -55,7 +53,7 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	if err := dec.Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		logger.GetLogger().Error(err)
+		h.logger.Errorf("%v", err)
 		return
 	}
 
@@ -75,6 +73,7 @@ func (h Handler) login(w http.ResponseWriter, ctx context.Context, login, passwo
 			return
 		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.logger.Errorf("%v", err)
 		return
 	}
 

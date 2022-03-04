@@ -4,7 +4,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"gophermart/pkg/config"
+	"gophermart/pkg/logger"
 	"gophermart/pkg/token"
+	"gophermart/provider/accrual"
 	v1 "gophermart/service/v1"
 	"gophermart/storage"
 	"gophermart/storage/pgsql"
@@ -27,9 +29,24 @@ func (s *Suite) SetupTest() {
 	cfg.DatabaseURI = "postgres://forge:secret@localhost:54321/gophermart?sslmode=disable"
 	st, _ := pgsql.NewStorage(cfg)
 	st.Truncate()
-	us := v1.NewUserService(st, st)
-	os := v1.NewOrderService(st, st)
-	s.handler = NewHandler(WithUserService(us), WithOrderService(os))
+
+	lgr := logger.GetLogger()
+	accrualProvider := accrual.NewFakeHTTProvider()
+
+	us := v1.NewUserService(
+		v1.WithUserStorageUserOption(st),
+		v1.WithTransactionStorageUserOption(st),
+		v1.WithLoggerUserOption(lgr),
+	)
+
+	os := v1.NewOrderService(
+		v1.WithOrderStorageOrderOption(st),
+		v1.WithTransactionStorageOrderOption(st),
+		v1.WithLoggerOrderOption(lgr),
+		v1.WithProviderOrderOption(accrualProvider),
+	)
+
+	s.handler = NewHandler(WithUserService(us), WithOrderService(os), WithLogger(lgr))
 	s.us = st
 	s.os = st
 	s.ts = st

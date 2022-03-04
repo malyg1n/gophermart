@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"gophermart/pkg/logger"
 	"gophermart/service"
 )
 
@@ -8,6 +9,7 @@ import (
 type Handler struct {
 	userService  service.IUserService
 	orderService service.IOrderService
+	logger       logger.Logger
 }
 
 // Option for Handler.
@@ -35,5 +37,12 @@ func WithUserService(sv service.IUserService) Option {
 func WithOrderService(sv service.IOrderService) Option {
 	return func(handler *Handler) {
 		handler.orderService = sv
+	}
+}
+
+// WithLogger option.
+func WithLogger(l logger.Logger) Option {
+	return func(handler *Handler) {
+		handler.logger = l
 	}
 }
