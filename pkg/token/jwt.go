@@ -64,10 +64,6 @@ func GetClaimsByToken(tokenString string) (Claims, error) {
 	tokenClaims.ExpiresAT = int64(expiresAt)
 	tokenClaims.UserID = int(userID)
 
-	if err != nil {
-		return tokenClaims, err
-	}
-
 	return tokenClaims, nil
 }
 
