@@ -55,6 +55,7 @@ func GetConfig() (*AppConfig, error) {
 		AccrualAddress: accrualAddr,
 		AppSecret:      appSecret,
 	}
+	fmt.Println(instance)
 
 	return instance, nil
 }

@@ -68,6 +68,7 @@ func (s OrderService) updateOrder(ctx context.Context, number, status string, ac
 
 // processOrder check order in accrual system.
 func (s OrderService) processOrder(ctx context.Context, orderID string) error {
+	logger.GetLogger().Info("order number " + orderID)
 	var i int
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -78,12 +79,12 @@ func (s OrderService) processOrder(ctx context.Context, orderID string) error {
 	// 100 tries to check order
 	for i < 100 {
 		order, err := provider.CheckOrder(orderID)
-		logger.GetLogger().Error(err)
 		if err != nil {
 			if errors.Is(errs.ErrToManyRequests, err) {
 				time.Sleep(time.Second * 60)
+				continue
 			}
-			continue
+			return err
 		}
 		if status != order.Status {
 			status = order.Status
