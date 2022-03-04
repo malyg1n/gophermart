@@ -44,7 +44,7 @@ func (s *Storage) SaveTransaction(ctx context.Context, userID int, orderID strin
 func (s *Storage) updateUserBalance(ctx context.Context, userID int, amount float64) error {
 	_, err := s.db.ExecContext(
 		ctx,
-		"update users set balance = $1 where id = $2",
+		"update users set balance = balance + $1 where id = $2",
 		amount,
 		userID,
 	)

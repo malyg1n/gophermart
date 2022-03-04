@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"errors"
+	"fmt"
 	"gophermart/model"
 	"gophermart/pkg/config"
 	"gophermart/pkg/errs"
@@ -96,6 +97,7 @@ func (s OrderService) processOrder(ctx context.Context, orderID string, userID i
 
 		if status == "PROCESSED" || status == "INVALID" {
 			if status == "PROCESSED" {
+				logger.GetLogger().Info(fmt.Sprintf("%v %v %v", userID, orderID, order.Accrual))
 				return s.transactionStorage.SaveTransaction(ctx, userID, orderID, order.Accrual)
 			}
 			return nil
