@@ -43,9 +43,9 @@ func (s OrderService) CreateOrder(ctx context.Context, number string, userID int
 	}
 
 	go func() {
-		err = s.processOrder(ctx, number, userID)
+		err = s.processOrder(number, userID)
 		if err != nil {
-			logger.GetLogger().Error(err)
+			logger.GetLogger().Info(err.Error())
 		}
 	}()
 
@@ -68,7 +68,10 @@ func (s OrderService) updateOrder(ctx context.Context, number, status string, ac
 }
 
 // processOrder check order in accrual system.
-func (s OrderService) processOrder(ctx context.Context, orderID string, userID int) error {
+func (s OrderService) processOrder(orderID string, userID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
+	defer cancel()
+
 	logger.GetLogger().Info("order number " + orderID)
 	var i int
 	cfg, err := config.GetConfig()
