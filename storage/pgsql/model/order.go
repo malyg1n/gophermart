@@ -5,7 +5,7 @@ import "gophermart/model"
 // Order db model.
 type Order struct {
 	ID         string  `db:"id"`
-	UserID     int     `db:"user_id"`
+	UserID     uint64  `db:"user_id"`
 	Status     string  `db:"status"`
 	Accrual    float64 `db:"accrual"`
 	UploadedAT string  `db:"uploaded_at"`

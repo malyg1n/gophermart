@@ -18,7 +18,7 @@ func init() {
 
 // Claims by token.
 type Claims struct {
-	UserID    int
+	UserID    uint64
 	ExpiresAt int64
 }
 
@@ -56,14 +56,14 @@ func GetClaimsByToken(tokenString string) (*Claims, error) {
 	}
 	tokenClaims := &Claims{
 		ExpiresAt: int64(expiresAt),
-		UserID:    int(userID),
+		UserID:    uint64(userID),
 	}
 
 	return tokenClaims, nil
 }
 
 // CreateTokenByUserID returns token string by user.
-func CreateTokenByUserID(userID int) (string, error) {
+func CreateTokenByUserID(userID uint64) (string, error) {
 	claims := Claims{
 		UserID:    userID,
 		ExpiresAt: time.Now().Local().Add(time.Minute * time.Duration(10)).Unix(),

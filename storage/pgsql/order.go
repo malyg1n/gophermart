@@ -7,7 +7,7 @@ import (
 )
 
 // CreateOrder makes new order.
-func (s Storage) CreateOrder(ctx context.Context, number string, userID int) error {
+func (s Storage) CreateOrder(ctx context.Context, number string, userID uint64) error {
 	_, err := s.db.ExecContext(
 		ctx,
 		"insert into orders (id, user_id) values ($1, $2);",
@@ -32,7 +32,7 @@ func (s Storage) GetOrderByNumber(ctx context.Context, number string) (*model.Or
 }
 
 // GetOrdersByUser returns orders by user.
-func (s Storage) GetOrdersByUser(ctx context.Context, userID int) ([]model.Order, error) {
+func (s Storage) GetOrdersByUser(ctx context.Context, userID uint64) ([]model.Order, error) {
 	var orders []model.Order
 	var dbOrders []dbModel.Order
 

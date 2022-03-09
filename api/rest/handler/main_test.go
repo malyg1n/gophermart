@@ -74,7 +74,7 @@ func (s *Suite) testRequest(method, path string, payload io.Reader, headers map[
 	return resp
 }
 
-func (s *Suite) getAuthHeader(userID int) map[string]string {
+func (s *Suite) getAuthHeader(userID uint64) map[string]string {
 	tkn, err := token.CreateTokenByUserID(userID)
 	require.NoError(s.T(), err)
 

@@ -83,7 +83,7 @@ func (s UserService) Auth(ctx context.Context, login, password string) (string, 
 }
 
 // ShowBalance shows user balance.
-func (s UserService) ShowBalance(ctx context.Context, userID int) (*response.Balance, error) {
+func (s UserService) ShowBalance(ctx context.Context, userID uint64) (*response.Balance, error) {
 	user, err := s.userStorage.GetUserByID(ctx, userID)
 	if err != nil {
 		s.logger.Errorf("%v", err)
@@ -96,7 +96,7 @@ func (s UserService) ShowBalance(ctx context.Context, userID int) (*response.Bal
 }
 
 // GetTransactions by user
-func (s UserService) GetTransactions(ctx context.Context, userID int) ([]model.Transaction, error) {
+func (s UserService) GetTransactions(ctx context.Context, userID uint64) ([]model.Transaction, error) {
 	transactions, err := s.transactionStorage.GetOutcomeTransactionsByUser(ctx, userID)
 	if err != nil {
 		s.logger.Infof("%v", err)
@@ -105,7 +105,7 @@ func (s UserService) GetTransactions(ctx context.Context, userID int) ([]model.T
 }
 
 // Withdraw money from user.
-func (s UserService) Withdraw(ctx context.Context, userID int, orderID string, sum float64) error {
+func (s UserService) Withdraw(ctx context.Context, userID uint64, orderID string, sum float64) error {
 	user, err := s.userStorage.GetUserByID(ctx, userID)
 	if err != nil {
 		s.logger.Errorf("%v", err)

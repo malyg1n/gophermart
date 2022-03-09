@@ -4,7 +4,7 @@ import "gophermart/model"
 
 // User model.
 type User struct {
-	ID       int     `db:"id"`
+	ID       uint64  `db:"id"`
 	Login    string  `db:"login"`
 	Password string  `db:"password"`
 	Balance  float64 `db:"balance"`

@@ -62,7 +62,7 @@ func WithProviderOrderOption(p accrual.IAccrualProvider) OrderOption {
 }
 
 // CreateOrder makes new order.
-func (s OrderService) CreateOrder(ctx context.Context, number string, userID int) error {
+func (s OrderService) CreateOrder(ctx context.Context, number string, userID uint64) error {
 	if !validation.IsLunh(number) {
 		return errs.ErrOrderNumber
 	}
@@ -91,7 +91,7 @@ func (s OrderService) GetOrderByNumber(ctx context.Context, number string) (*mod
 }
 
 // GetOrdersByUser returns orders by user.
-func (s OrderService) GetOrdersByUser(ctx context.Context, userID int) ([]model.Order, error) {
+func (s OrderService) GetOrdersByUser(ctx context.Context, userID uint64) ([]model.Order, error) {
 	orders, err := s.orderStorage.GetOrdersByUser(ctx, userID)
 	if err != nil {
 		s.logger.Errorf("%v", err)
@@ -111,7 +111,7 @@ func (s *OrderService) updateOrder(ctx context.Context, number, status string, a
 }
 
 // processOrder check order in accrual system.
-func (s OrderService) processOrder(orderID string, userID int) {
+func (s OrderService) processOrder(orderID string, userID uint64) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
 	defer cancel()
 
