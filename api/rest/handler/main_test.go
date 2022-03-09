@@ -25,12 +25,12 @@ type Suite struct {
 }
 
 func (s *Suite) SetupTest() {
-	cfg, _ := config.GetConfig()
+	cfg, _ := config.NewDefaultConfig()
 	cfg.DatabaseURI = "postgres://forge:secret@localhost:54321/gophermart?sslmode=disable"
-	st, _ := pgsql.NewStorage(cfg)
+	st, _ := pgsql.NewStorage(cfg.DatabaseURI)
 	st.Truncate()
 
-	lgr := logger.GetLogger()
+	lgr := logger.NewDefaultLogger()
 	accrualProvider := accrual.NewFakeHTTProvider()
 
 	us := v1.NewUserService(

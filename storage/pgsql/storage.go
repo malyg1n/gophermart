@@ -3,7 +3,6 @@ package pgsql
 import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"gophermart/pkg/config"
 )
 
 // Storage base struct.
@@ -12,8 +11,8 @@ type Storage struct {
 }
 
 // NewStorage returns new storage instance.
-func NewStorage(cfg *config.AppConfig) (*Storage, error) {
-	db, err := sqlx.Open("postgres", cfg.DatabaseURI)
+func NewStorage(dbURI string) (*Storage, error) {
+	db, err := sqlx.Open("postgres", dbURI)
 	if err != nil {
 		return nil, err
 	}

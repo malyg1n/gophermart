@@ -18,20 +18,20 @@ func main() {
 	ctx, ctxCancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer ctxCancel()
 
-	cfg, err := config.GetConfig()
+	lgr := logger.NewDefaultLogger()
+	cfg, err := config.NewDefaultConfig()
 	if err != nil {
-		logger.GetLogger().Errorw("config error", "error", err.Error())
+		lgr.Fatalf("config error %v", err)
 		os.Exit(1)
 	}
 
-	stg, err := pgsql.NewStorage(cfg)
-	if err != nil {
-		logger.GetLogger().Errorw("storage error", "error", err.Error())
-		os.Exit(1)
-	}
-
-	lgr := logger.GetLogger()
 	accrualProvider := accrual.NewAccrualHTTPProvider(cfg.AccrualAddress)
+	stg, err := pgsql.NewStorage(cfg.DatabaseURI)
+
+	if err != nil {
+		lgr.Fatalf("storage error %v", err)
+		os.Exit(1)
+	}
 
 	userService := v1.NewUserService(
 		v1.WithUserStorageUserOption(stg),
@@ -56,5 +56,5 @@ func main() {
 	server.Run(ctx)
 
 	<-ctx.Done()
-	logger.GetLogger().Info("shutting down server")
+	lgr.Infof("shutting down server")
 }

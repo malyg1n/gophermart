@@ -21,40 +21,41 @@ const (
 	AppSecretName   = "app_secret"
 )
 
-var instance *AppConfig
-
-// GetConfig return an instance of AppConfig.
-func GetConfig() (*AppConfig, error) {
-	if instance != nil {
-		return instance, nil
-	}
-
+func init() {
 	viper.AutomaticEnv()
 	pflag.StringP(dbURIName, "d", "", "database connection string")
 	pflag.StringP(RunAddrName, "a", "localhost:8080", "run address")
 	pflag.StringP(AccrualAddrName, "r", "http://localhost:8081", "accrual system address")
 	pflag.StringP(AppSecretName, "k", "app-secret-key", "secret key for app")
+}
+
+// NewDefaultConfig return an instance of AppConfig.
+func NewDefaultConfig() (config AppConfig, err error) {
 	pflag.Parse()
-	err := viper.BindPFlags(pflag.CommandLine)
+
+	config = AppConfig{}
+	err = viper.BindPFlags(pflag.CommandLine)
+
 	if err != nil {
-		return nil, fmt.Errorf("parsing flag error %w", err)
+		return
 	}
 
-	dbURI := viper.GetString(dbURIName)
-	runAddr := viper.GetString(RunAddrName)
-	accrualAddr := viper.GetString(AccrualAddrName)
-	appSecret := viper.GetString(AppSecretName)
+	config.RunAddress = viper.GetString(RunAddrName)
+	config.DatabaseURI = viper.GetString(dbURIName)
+	config.AccrualAddress = viper.GetString(AccrualAddrName)
+	config.AppSecret = viper.GetString(AppSecretName)
 
-	if appSecret == "" {
-		appSecret = "very-secret-key"
+	if config.RunAddress == "" {
+		config.RunAddress = "localhost:8080"
 	}
-
-	instance = &AppConfig{
-		RunAddress:     runAddr,
-		DatabaseURI:    dbURI,
-		AccrualAddress: accrualAddr,
-		AppSecret:      appSecret,
+	if config.DatabaseURI == "" {
+		return config, fmt.Errorf("database dsn was not setted")
 	}
-
-	return instance, nil
+	if config.AccrualAddress == "" {
+		return config, fmt.Errorf("accrual system adress was not setted")
+	}
+	if config.AppSecret == "" {
+		config.AppSecret = "very-secret-key"
+	}
+	return
 }

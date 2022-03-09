@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"gophermart/model"
 	"gophermart/pkg/errs"
-	"gophermart/pkg/logger"
 	"net/http"
 )
 
@@ -31,8 +30,7 @@ func (p HTTPProvider) CheckOrder(orderID string) (*model.Order, error) {
 	if err != nil {
 		return nil, err
 	}
-	logger.GetLogger().Info(p.addr + "/api/orders/" + orderID)
-	logger.GetLogger().Info(resp.StatusCode)
+
 	if resp.StatusCode != http.StatusOK {
 		if resp.StatusCode == http.StatusTooManyRequests {
 			return nil, errs.ErrToManyRequests

@@ -3,7 +3,6 @@ package rest
 import (
 	"context"
 	"gophermart/api/rest/handler"
-	"gophermart/pkg/logger"
 	"net/http"
 )
 
@@ -26,7 +25,6 @@ func NewAPIServer(handler *handler.Handler, addr string) *APIServer {
 // Run HTTP server.
 func (srv *APIServer) Run(ctx context.Context) error {
 	go func() {
-		logger.GetLogger().Infow("server started", "addr", srv.server.Addr)
 		_ = srv.server.ListenAndServe()
 	}()
 

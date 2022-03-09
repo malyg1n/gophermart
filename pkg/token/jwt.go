@@ -8,11 +8,15 @@ import (
 	"time"
 )
 
-var hmacSecret []byte
+var (
+	hmacSecret []byte
+	lgr        logger.Logger
+)
 
 func init() {
-	cfg, _ := config.GetConfig()
+	cfg, _ := config.NewDefaultConfig()
 	hmacSecret = []byte(cfg.AppSecret)
+	lgr = logger.NewDefaultLogger()
 }
 
 // Claims by token.
@@ -26,7 +30,7 @@ func GetClaimsByToken(tokenString string) (Claims, error) {
 	tokenClaims := Claims{}
 	defer func() {
 		if r := recover(); r != nil {
-			logger.GetLogger().Errorf("%v", r)
+			lgr.Errorf("%v", r)
 		}
 	}()
 
