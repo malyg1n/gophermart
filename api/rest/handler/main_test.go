@@ -25,7 +25,8 @@ type Suite struct {
 }
 
 func (s *Suite) SetupTest() {
-	cfg, _ := config.NewDefaultConfig()
+	cfg, err := config.NewDefaultConfig()
+	require.NoError(s.T(), err)
 	cfg.DatabaseURI = "postgres://forge:secret@localhost:54321/gophermart?sslmode=disable"
 	st, _ := pgsql.NewStorage(cfg.DatabaseURI)
 	st.Truncate()

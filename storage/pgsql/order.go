@@ -7,7 +7,7 @@ import (
 )
 
 // CreateOrder makes new order.
-func (s *Storage) CreateOrder(ctx context.Context, number string, userID int) error {
+func (s Storage) CreateOrder(ctx context.Context, number string, userID int) error {
 	_, err := s.db.ExecContext(
 		ctx,
 		"insert into orders (id, user_id) values ($1, $2);",
@@ -19,20 +19,22 @@ func (s *Storage) CreateOrder(ctx context.Context, number string, userID int) er
 }
 
 // GetOrderByNumber returns order by number.
-func (s *Storage) GetOrderByNumber(ctx context.Context, number string) (*model.Order, error) {
+func (s Storage) GetOrderByNumber(ctx context.Context, number string) (*model.Order, error) {
 	var order dbModel.Order
 	query := "select * from orders where id = $1"
 	if err := s.db.GetContext(ctx, &order, query, number); err != nil {
 		return nil, err
 	}
 
-	return order.ToCanonical(), nil
+	baseOrder := order.ToCanonical()
+
+	return &baseOrder, nil
 }
 
 // GetOrdersByUser returns orders by user.
-func (s *Storage) GetOrdersByUser(ctx context.Context, userID int) ([]*model.Order, error) {
-	var orders []*model.Order
-	var dbOrders []*dbModel.Order
+func (s Storage) GetOrdersByUser(ctx context.Context, userID int) ([]model.Order, error) {
+	var orders []model.Order
+	var dbOrders []dbModel.Order
 
 	err := s.db.SelectContext(ctx, &dbOrders, "select * from orders where user_id = $1", userID)
 	if err != nil {

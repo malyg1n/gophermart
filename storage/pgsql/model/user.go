@@ -12,8 +12,8 @@ type User struct {
 }
 
 // ToCanonical converts db model to base model.
-func (u User) ToCanonical() *model.User {
-	return &model.User{
+func (u User) ToCanonical() model.User {
+	return model.User{
 		ID:            u.ID,
 		Login:         u.Login,
 		CryptPassword: u.Password,

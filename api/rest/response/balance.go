@@ -9,8 +9,8 @@ type Balance struct {
 }
 
 // BalanceFromUser converts base user model to Balance.
-func BalanceFromUser(u *model.User) *Balance {
-	return &Balance{
+func BalanceFromUser(u model.User) Balance {
+	return Balance{
 		Current:   u.Balance,
 		Withdrawn: u.Outcome,
 	}

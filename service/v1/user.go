@@ -47,11 +47,13 @@ func (s UserService) ShowBalance(ctx context.Context, userID int) (*response.Bal
 		return nil, err
 	}
 
-	return response.BalanceFromUser(user), nil
+	balance := response.BalanceFromUser(*user)
+
+	return &balance, nil
 }
 
 // GetTransactions by user
-func (s UserService) GetTransactions(ctx context.Context, userID int) ([]*model.Transaction, error) {
+func (s UserService) GetTransactions(ctx context.Context, userID int) ([]model.Transaction, error) {
 	transactions, err := s.transactionStorage.GetOutcomeTransactionsByUser(ctx, userID)
 	if err != nil {
 		s.logger.Infof("%v", err)

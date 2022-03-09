@@ -10,7 +10,7 @@ import (
 )
 
 // CreateOrder makes new order.
-func (s *OrderService) CreateOrder(ctx context.Context, number string, userID int) error {
+func (s OrderService) CreateOrder(ctx context.Context, number string, userID int) error {
 	if !validation.IsLunh(number) {
 		return errs.ErrOrderNumber
 	}
@@ -29,7 +29,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, number string, userID in
 }
 
 // GetOrderByNumber returns order by number.
-func (s *OrderService) GetOrderByNumber(ctx context.Context, number string) (*model.Order, error) {
+func (s OrderService) GetOrderByNumber(ctx context.Context, number string) (*model.Order, error) {
 	orders, err := s.orderStorage.GetOrderByNumber(ctx, number)
 	if err != nil {
 		s.logger.Errorf("%v", err)
@@ -39,7 +39,7 @@ func (s *OrderService) GetOrderByNumber(ctx context.Context, number string) (*mo
 }
 
 // GetOrdersByUser returns orders by user.
-func (s OrderService) GetOrdersByUser(ctx context.Context, userID int) ([]*model.Order, error) {
+func (s OrderService) GetOrdersByUser(ctx context.Context, userID int) ([]model.Order, error) {
 	orders, err := s.orderStorage.GetOrdersByUser(ctx, userID)
 	if err != nil {
 		s.logger.Errorf("%v", err)
@@ -59,7 +59,7 @@ func (s *OrderService) updateOrder(ctx context.Context, number, status string, a
 }
 
 // processOrder check order in accrual system.
-func (s *OrderService) processOrder(orderID string, userID int) {
+func (s OrderService) processOrder(orderID string, userID int) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
 	defer cancel()
 

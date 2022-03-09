@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -39,31 +38,17 @@ func NewDefaultConfig() (*AppConfig, error) {
 
 	pflag.Parse()
 
-	config := &AppConfig{}
 	err := viper.BindPFlags(pflag.CommandLine)
 
 	if err != nil {
 		return nil, err
 	}
 
-	config.RunAddress = viper.GetString(RunAddrName)
-	config.DatabaseURI = viper.GetString(dbURIName)
-	config.AccrualAddress = viper.GetString(AccrualAddrName)
-	config.AppSecret = viper.GetString(AppSecretName)
-
-	if config.RunAddress == "" {
-		config.RunAddress = "localhost:8080"
-	}
-	if config.DatabaseURI == "" {
-		return nil, fmt.Errorf("database dsn was not setted")
-	}
-	if config.AccrualAddress == "" {
-		return nil, fmt.Errorf("accrual system adress was not setted")
-	}
-	if config.AppSecret == "" {
-		config.AppSecret = "very-secret-key"
-	}
-	instance = config
+	instance := &AppConfig{}
+	instance.RunAddress = viper.GetString(RunAddrName)
+	instance.DatabaseURI = viper.GetString(dbURIName)
+	instance.AccrualAddress = viper.GetString(AccrualAddrName)
+	instance.AppSecret = viper.GetString(AppSecretName)
 
 	return instance, nil
 }

@@ -11,7 +11,7 @@ type Order struct {
 }
 
 // OrderFromCanonical converts base model to response model.
-func OrderFromCanonical(o *model.Order) Order {
+func OrderFromCanonical(o model.Order) Order {
 	return Order{
 		Number:     o.Number,
 		Status:     o.Status,

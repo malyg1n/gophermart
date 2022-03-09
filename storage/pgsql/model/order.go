@@ -12,8 +12,8 @@ type Order struct {
 }
 
 // ToCanonical converts db model to base model.
-func (o Order) ToCanonical() *model.Order {
-	return &model.Order{
+func (o Order) ToCanonical() model.Order {
+	return model.Order{
 		Number:     o.ID,
 		UserID:     o.UserID,
 		Status:     o.Status,

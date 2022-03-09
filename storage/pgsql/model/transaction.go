@@ -12,8 +12,8 @@ type Transaction struct {
 }
 
 // ToCanonical converts db model to base model.
-func (t Transaction) ToCanonical() *model.Transaction {
-	return &model.Transaction{
+func (t Transaction) ToCanonical() model.Transaction {
+	return model.Transaction{
 		UserID:    t.UserID,
 		OrderID:   t.OrderID,
 		Amount:    t.Amount,
