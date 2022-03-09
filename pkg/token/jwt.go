@@ -4,19 +4,16 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"gophermart/pkg/config"
-	"gophermart/pkg/logger"
 	"time"
 )
 
 var (
 	hmacSecret []byte
-	lgr        logger.Logger
 )
 
 func init() {
 	cfg, _ := config.NewDefaultConfig()
 	hmacSecret = []byte(cfg.AppSecret)
-	lgr = logger.NewDefaultLogger()
 }
 
 // Claims by token.
@@ -26,14 +23,7 @@ type Claims struct {
 }
 
 // GetClaimsByToken returns userID by token.
-func GetClaimsByToken(tokenString string) (Claims, error) {
-	tokenClaims := Claims{}
-	defer func() {
-		if r := recover(); r != nil {
-			lgr.Errorf("%v", r)
-		}
-	}()
-
+func GetClaimsByToken(tokenString string) (*Claims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -42,31 +32,32 @@ func GetClaimsByToken(tokenString string) (Claims, error) {
 	})
 
 	if err != nil {
-		return tokenClaims, fmt.Errorf("token parse error: %w", err)
+		return nil, fmt.Errorf("token parse error: %w", err)
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return tokenClaims, fmt.Errorf("invalid token: %s", tokenString)
+		return nil, fmt.Errorf("invalid token: %s", tokenString)
 	}
 
 	localClaims, ok := claims["token"].(map[string]interface{})
 	if !ok {
-		return tokenClaims, fmt.Errorf("invalid token claims: %s", tokenString)
+		return nil, fmt.Errorf("invalid token claims: %s", tokenString)
 	}
 
 	userID, ok := localClaims["UserID"].(float64)
 	if !ok {
-		return tokenClaims, fmt.Errorf("invalid user id: %v", localClaims["UserID"])
+		return nil, fmt.Errorf("invalid user id: %v", localClaims["UserID"])
 	}
 
 	expiresAt, ok := localClaims["ExpiresAt"].(float64)
 	if !ok {
-		return tokenClaims, fmt.Errorf("invalid expires at: %v", expiresAt)
+		return nil, fmt.Errorf("invalid expires at: %v", expiresAt)
 	}
-
-	tokenClaims.ExpiresAt = int64(expiresAt)
-	tokenClaims.UserID = int(userID)
+	tokenClaims := &Claims{
+		ExpiresAt: int64(expiresAt),
+		UserID:    int(userID),
+	}
 
 	return tokenClaims, nil
 }

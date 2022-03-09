@@ -21,6 +21,8 @@ const (
 	AppSecretName   = "app_secret"
 )
 
+var instance *AppConfig
+
 func init() {
 	viper.AutomaticEnv()
 	pflag.StringP(dbURIName, "d", "", "database connection string")
@@ -30,14 +32,18 @@ func init() {
 }
 
 // NewDefaultConfig return an instance of AppConfig.
-func NewDefaultConfig() (config AppConfig, err error) {
+func NewDefaultConfig() (*AppConfig, error) {
+	if instance != nil {
+		return instance, nil
+	}
+
 	pflag.Parse()
 
-	config = AppConfig{}
-	err = viper.BindPFlags(pflag.CommandLine)
+	config := &AppConfig{}
+	err := viper.BindPFlags(pflag.CommandLine)
 
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	config.RunAddress = viper.GetString(RunAddrName)
@@ -49,13 +55,15 @@ func NewDefaultConfig() (config AppConfig, err error) {
 		config.RunAddress = "localhost:8080"
 	}
 	if config.DatabaseURI == "" {
-		return config, fmt.Errorf("database dsn was not setted")
+		return nil, fmt.Errorf("database dsn was not setted")
 	}
 	if config.AccrualAddress == "" {
-		return config, fmt.Errorf("accrual system adress was not setted")
+		return nil, fmt.Errorf("accrual system adress was not setted")
 	}
 	if config.AppSecret == "" {
 		config.AppSecret = "very-secret-key"
 	}
-	return
+	instance = config
+
+	return instance, nil
 }
