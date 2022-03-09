@@ -30,7 +30,7 @@ func Auth(next http.Handler) http.Handler {
 			return
 		}
 
-		if userClaims.ExpiresAT < time.Now().Local().Unix() {
+		if userClaims.ExpiresAt < time.Now().Local().Unix() {
 			http.Error(w, "token expired", http.StatusUnauthorized)
 			return
 		}

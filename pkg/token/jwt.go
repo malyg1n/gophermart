@@ -22,7 +22,7 @@ func init() {
 // Claims by token.
 type Claims struct {
 	UserID    int
-	ExpiresAT int64
+	ExpiresAt int64
 }
 
 // GetClaimsByToken returns userID by token.
@@ -60,12 +60,12 @@ func GetClaimsByToken(tokenString string) (Claims, error) {
 		return tokenClaims, fmt.Errorf("invalid user id: %v", localClaims["UserID"])
 	}
 
-	expiresAt, ok := localClaims["ExpiresAT"].(float64)
+	expiresAt, ok := localClaims["ExpiresAt"].(float64)
 	if !ok {
 		return tokenClaims, fmt.Errorf("invalid expires at: %v", expiresAt)
 	}
 
-	tokenClaims.ExpiresAT = int64(expiresAt)
+	tokenClaims.ExpiresAt = int64(expiresAt)
 	tokenClaims.UserID = int(userID)
 
 	return tokenClaims, nil
@@ -75,7 +75,7 @@ func GetClaimsByToken(tokenString string) (Claims, error) {
 func CreateTokenByUserID(userID int) (string, error) {
 	claims := Claims{
 		UserID:    userID,
-		ExpiresAT: time.Now().Local().Add(time.Minute * time.Duration(10)).Unix(),
+		ExpiresAt: time.Now().Local().Add(time.Minute * time.Duration(10)).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
