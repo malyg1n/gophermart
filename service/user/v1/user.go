@@ -6,8 +6,51 @@ import (
 	"gophermart/api/rest/response"
 	"gophermart/model"
 	"gophermart/pkg/errs"
+	"gophermart/pkg/logger"
 	"gophermart/pkg/token"
+	"gophermart/storage"
 )
+
+// UserService for working with users.
+type UserService struct {
+	userStorage        storage.UserStorer
+	transactionStorage storage.TransactionStorer
+	logger             logger.Logger
+}
+
+type UserOption func(service *UserService)
+
+// NewUserService constructor.
+func NewUserService(opts ...UserOption) *UserService {
+	service := &UserService{}
+
+	for _, opt := range opts {
+		opt(service)
+	}
+
+	return service
+}
+
+// WithUserStorageUserOption option.
+func WithUserStorageUserOption(st storage.UserStorer) UserOption {
+	return func(service *UserService) {
+		service.userStorage = st
+	}
+}
+
+// WithTransactionStorageUserOption option.
+func WithTransactionStorageUserOption(st storage.TransactionStorer) UserOption {
+	return func(service *UserService) {
+		service.transactionStorage = st
+	}
+}
+
+// WithLoggerUserOption option.
+func WithLoggerUserOption(l logger.Logger) UserOption {
+	return func(service *UserService) {
+		service.logger = l
+	}
+}
 
 // Create user.
 func (s UserService) Create(ctx context.Context, login, password string) error {
@@ -16,8 +59,8 @@ func (s UserService) Create(ctx context.Context, login, password string) error {
 		s.logger.Errorf("%v", err)
 		return err
 	}
-	_, err = s.userStorage.GetUserByLogin(ctx, login)
-	if err == nil {
+	user, _ := s.userStorage.GetUserByLogin(ctx, login)
+	if user != nil {
 		return errs.ErrLoginExists
 	}
 

@@ -2,6 +2,7 @@ package pgsql
 
 import (
 	"context"
+	"fmt"
 	"gophermart/model"
 	dbModel "gophermart/storage/pgsql/model"
 )
@@ -15,7 +16,11 @@ func (s Storage) CreateUser(ctx context.Context, login, password string) error {
 		password,
 	)
 
-	return err
+	if err != nil {
+		return fmt.Errorf("sql error: %w", err)
+	}
+
+	return nil
 }
 
 // GetUserByLogin returns user by login

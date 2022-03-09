@@ -5,9 +5,61 @@ import (
 	"errors"
 	"gophermart/model"
 	"gophermart/pkg/errs"
+	"gophermart/pkg/logger"
 	"gophermart/pkg/validation"
+	"gophermart/provider/accrual"
+	"gophermart/storage"
 	"time"
 )
+
+// OrderService struct.
+type OrderService struct {
+	orderStorage       storage.OrderStorer
+	transactionStorage storage.TransactionStorer
+	logger             logger.Logger
+	provider           accrual.IAccrualProvider
+}
+
+type OrderOption func(service *OrderService)
+
+// NewOrderService constructor.
+func NewOrderService(opts ...OrderOption) *OrderService {
+	service := &OrderService{}
+
+	for _, opt := range opts {
+		opt(service)
+	}
+
+	return service
+}
+
+// WithOrderStorageOrderOption option.
+func WithOrderStorageOrderOption(st storage.OrderStorer) OrderOption {
+	return func(service *OrderService) {
+		service.orderStorage = st
+	}
+}
+
+// WithTransactionStorageOrderOption option.
+func WithTransactionStorageOrderOption(st storage.TransactionStorer) OrderOption {
+	return func(service *OrderService) {
+		service.transactionStorage = st
+	}
+}
+
+// WithLoggerOrderOption option.
+func WithLoggerOrderOption(l logger.Logger) OrderOption {
+	return func(service *OrderService) {
+		service.logger = l
+	}
+}
+
+// WithProviderOrderOption option.
+func WithProviderOrderOption(p accrual.IAccrualProvider) OrderOption {
+	return func(service *OrderService) {
+		service.provider = p
+	}
+}
 
 // CreateOrder makes new order.
 func (s OrderService) CreateOrder(ctx context.Context, number string, userID int) error {

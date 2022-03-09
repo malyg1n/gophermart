@@ -7,7 +7,8 @@ import (
 	"gophermart/pkg/config"
 	"gophermart/pkg/logger"
 	"gophermart/provider/accrual"
-	v1 "gophermart/service/v1"
+	orderService "gophermart/service/order/v1"
+	userService "gophermart/service/user/v1"
 	"gophermart/storage/pgsql"
 	"os"
 	"os/signal"
@@ -33,22 +34,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	userService := v1.NewUserService(
-		v1.WithUserStorageUserOption(stg),
-		v1.WithTransactionStorageUserOption(stg),
-		v1.WithLoggerUserOption(lgr),
+	us := userService.NewUserService(
+		userService.WithUserStorageUserOption(stg),
+		userService.WithTransactionStorageUserOption(stg),
+		userService.WithLoggerUserOption(lgr),
 	)
 
-	orderService := v1.NewOrderService(
-		v1.WithOrderStorageOrderOption(stg),
-		v1.WithTransactionStorageOrderOption(stg),
-		v1.WithLoggerOrderOption(lgr),
-		v1.WithProviderOrderOption(accrualProvider),
+	ose := orderService.NewOrderService(
+		orderService.WithOrderStorageOrderOption(stg),
+		orderService.WithTransactionStorageOrderOption(stg),
+		orderService.WithLoggerOrderOption(lgr),
+		orderService.WithProviderOrderOption(accrualProvider),
 	)
 
 	hr := handler.NewHandler(
-		handler.WithUserService(userService),
-		handler.WithOrderService(orderService),
+		handler.WithUserService(us),
+		handler.WithOrderService(ose),
 		handler.WithLogger(lgr),
 	)
 
