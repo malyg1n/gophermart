@@ -15,7 +15,7 @@ func OrderFromCanonical(o model.Order) Order {
 	return Order{
 		Number:     o.Number,
 		Status:     o.Status,
-		Accrual:    float64(o.Accrual / 100.0),
+		Accrual:    float64(o.Accrual) / float64(100),
 		UploadedAT: o.UploadedAT,
 	}
 }

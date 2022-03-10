@@ -13,7 +13,7 @@ type Transaction struct {
 func TransactionFromCanonical(t model.Transaction) Transaction {
 	return Transaction{
 		Order:       t.OrderID,
-		Sum:         float64(t.Amount / 100.0 * -1.0),
+		Sum:         float64(t.Amount) / float64(100) * -1.0,
 		ProcessedAt: t.CreatedAt,
 	}
 }
