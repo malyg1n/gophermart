@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"errors"
 	"gophermart/model"
 	"gophermart/pkg/errs"
 	"gophermart/pkg/logger"
@@ -115,40 +114,29 @@ func (s OrderService) processOrder(orderID string, userID uint64) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
 	defer cancel()
 
-	var i int
 	status := "NEW"
-	// 100 tries to check order (@todo refactor this shit)
-	for i < 100 {
-		order, err := s.provider.CheckOrder(orderID)
+	order, err := s.provider.CheckOrder(orderID)
+	if err != nil {
+		s.logger.Errorf("%v", err)
+		return
+	}
+	if status != order.Status {
+		status = order.Status
+		s.logger.Infof("update order %s, status=%s, accrual=%v", order.Number, order.Status, order.Accrual)
+		err = s.updateOrder(ctx, order.Number, order.Status, order.Accrual)
 		if err != nil {
-			if errors.Is(errs.ErrToManyRequests, err) {
-				time.Sleep(time.Second * 60)
-				continue
-			}
 			s.logger.Errorf("%v", err)
 			return
 		}
-		if status != order.Status {
-			status = order.Status
-			s.logger.Infof("update order %s, status=%s, accrual=%v", order.Number, order.Status, order.Accrual)
-			err = s.updateOrder(ctx, order.Number, order.Status, order.Accrual)
+	}
+
+	if status == "PROCESSED" || status == "INVALID" {
+		if status == "PROCESSED" {
+			err = s.transactionStorage.SaveTransaction(ctx, userID, orderID, order.Accrual)
 			if err != nil {
 				s.logger.Errorf("%v", err)
-				return
 			}
 		}
-
-		if status == "PROCESSED" || status == "INVALID" {
-			if status == "PROCESSED" {
-				err = s.transactionStorage.SaveTransaction(ctx, userID, orderID, order.Accrual)
-				if err != nil {
-					s.logger.Errorf("%v", err)
-				}
-			}
-			return
-		}
-
-		time.Sleep(time.Second)
-		i++
+		return
 	}
 }
