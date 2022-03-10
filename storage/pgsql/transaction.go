@@ -25,7 +25,12 @@ func (s Storage) GetOutcomeTransactionsByUser(ctx context.Context, userID uint64
 
 // SaveTransaction creates new transaction
 func (s Storage) SaveTransaction(ctx context.Context, userID uint64, orderID string, amount int) error {
-	_, err := s.db.ExecContext(
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(
 		ctx,
 		"insert into transactions (user_id, order_id, amount) values ($1, $2, $3)",
 		userID,
@@ -37,23 +42,19 @@ func (s Storage) SaveTransaction(ctx context.Context, userID uint64, orderID str
 		return err
 	}
 
-	return s.updateUserBalance(ctx, userID, amount)
-}
-
-// updateUserBalance update user balance.
-func (s Storage) updateUserBalance(ctx context.Context, userID uint64, amount int) error {
-	_, err := s.db.ExecContext(
+	_, err = tx.ExecContext(
 		ctx,
 		"update users set balance = balance + $1 where id = $2",
 		amount,
 		userID,
 	)
+
 	if err != nil {
 		return err
 	}
 
 	if amount < 0 {
-		_, err := s.db.ExecContext(
+		_, err = tx.ExecContext(
 			ctx,
 			"update users set outcome = outcome - $1 where id = $2",
 			amount,
@@ -64,5 +65,5 @@ func (s Storage) updateUserBalance(ctx context.Context, userID uint64, amount in
 		}
 	}
 
-	return nil
+	return tx.Commit()
 }

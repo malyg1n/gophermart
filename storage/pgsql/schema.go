@@ -22,7 +22,8 @@ create table if not exists transactions (
     user_id integer not null,
     order_id varchar (255) not null,
     amount int,
-    created_at timestamp(0) with time zone not null default current_timestamp
+    created_at timestamp(0) with time zone not null default current_timestamp,
+    unique (order_id, amount)
 );
 `
 
