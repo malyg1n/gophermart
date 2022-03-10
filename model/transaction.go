@@ -4,6 +4,6 @@ package model
 type Transaction struct {
 	UserID    string
 	OrderID   string
-	Amount    float64
+	Amount    int
 	CreatedAt string
 }

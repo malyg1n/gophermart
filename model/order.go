@@ -5,6 +5,6 @@ type Order struct {
 	Number     string
 	UserID     uint64
 	Status     string
-	Accrual    float64
+	Accrual    int
 	UploadedAT string
 }

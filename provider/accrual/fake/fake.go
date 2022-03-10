@@ -20,7 +20,7 @@ func (p HTTPProvider) CheckOrder(orderID string) (*model.Order, error) {
 	switch orderID {
 	case "12345678903001":
 		status = "PROCESSED"
-		accrual = 500
+		accrual = 500.28
 	default:
 		status = "PROCESSING"
 		accrual = 0
@@ -29,6 +29,6 @@ func (p HTTPProvider) CheckOrder(orderID string) (*model.Order, error) {
 	return &model.Order{
 		Number:  orderID,
 		Status:  status,
-		Accrual: accrual,
+		Accrual: int(accrual * 100),
 	}, nil
 }

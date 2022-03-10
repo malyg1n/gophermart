@@ -111,13 +111,15 @@ func (s UserService) Withdraw(ctx context.Context, userID uint64, orderID string
 		s.logger.Errorf("%v", err)
 		return err
 	}
-	if user.Balance < sum {
+	intSum := int(sum * 100)
+
+	if user.Balance < intSum {
 		return errs.ErrBalanceTooSmall
 	}
 
-	sum = sum * -1
+	intSum = intSum * -1
 
-	err = s.transactionStorage.SaveTransaction(ctx, userID, orderID, sum)
+	err = s.transactionStorage.SaveTransaction(ctx, userID, orderID, intSum)
 	if err != nil {
 		s.logger.Errorf("%v", err)
 		return err

@@ -11,7 +11,7 @@ type Balance struct {
 // BalanceFromUser converts base user model to Balance.
 func BalanceFromUser(u model.User) Balance {
 	return Balance{
-		Current:   u.Balance,
-		Withdrawn: u.Outcome,
+		Current:   float64(u.Balance / 100.0),
+		Withdrawn: float64(u.Outcome / 100.0),
 	}
 }

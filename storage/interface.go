@@ -17,11 +17,11 @@ type OrderStorer interface {
 	CreateOrder(ctx context.Context, number string, userID uint64) error
 	GetOrderByNumber(ctx context.Context, number string) (*model.Order, error)
 	GetOrdersByUser(ctx context.Context, userID uint64) ([]model.Order, error)
-	UpdateOrder(ctx context.Context, number, status string, accrual float64) error
+	UpdateOrder(ctx context.Context, number, status string, accrual int) error
 }
 
 // TransactionStorer interface for operations with transactions.
 type TransactionStorer interface {
 	GetOutcomeTransactionsByUser(ctx context.Context, userID uint64) ([]model.Transaction, error)
-	SaveTransaction(ctx context.Context, userID uint64, orderID string, amount float64) error
+	SaveTransaction(ctx context.Context, userID uint64, orderID string, amount int) error
 }

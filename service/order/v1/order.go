@@ -100,7 +100,7 @@ func (s OrderService) GetOrdersByUser(ctx context.Context, userID uint64) ([]mod
 }
 
 // updateOrder updates order.
-func (s *OrderService) updateOrder(ctx context.Context, number, status string, accrual float64) error {
+func (s *OrderService) updateOrder(ctx context.Context, number, status string, accrual int) error {
 	err := s.orderStorage.UpdateOrder(ctx, number, status, accrual)
 	if err != nil {
 		s.logger.Errorf("%v", err)

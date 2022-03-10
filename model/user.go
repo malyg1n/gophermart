@@ -6,6 +6,6 @@ type User struct {
 	Login         string
 	Password      string
 	CryptPassword string
-	Balance       float64
-	Outcome       float64
+	Balance       int
+	Outcome       int
 }

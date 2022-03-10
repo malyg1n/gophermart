@@ -49,7 +49,7 @@ func (s Storage) GetOrdersByUser(ctx context.Context, userID uint64) ([]model.Or
 }
 
 // UpdateOrder updates order.
-func (s *Storage) UpdateOrder(ctx context.Context, number, status string, accrual float64) error {
+func (s *Storage) UpdateOrder(ctx context.Context, number, status string, accrual int) error {
 	_, err := s.db.ExecContext(
 		ctx,
 		"update orders set status = $1, accrual = $2 where id = $3;",

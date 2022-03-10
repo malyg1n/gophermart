@@ -4,11 +4,11 @@ import "gophermart/model"
 
 // User model.
 type User struct {
-	ID       uint64  `db:"id"`
-	Login    string  `db:"login"`
-	Password string  `db:"password"`
-	Balance  float64 `db:"balance"`
-	Outcome  float64 `db:"outcome"`
+	ID       uint64 `db:"id"`
+	Login    string `db:"login"`
+	Password string `db:"password"`
+	Balance  int    `db:"balance"`
+	Outcome  int    `db:"outcome"`
 }
 
 // ToCanonical converts db model to base model.
