@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -56,6 +57,15 @@ func main() {
 	server := rest.NewAPIServer(hr, cfg.RunAddress)
 	server.Run(ctx)
 
+	ticker := time.NewTicker(5 * time.Second)
+	go func() {
+		for {
+			<-ticker.C
+			ose.ProcessOrders()
+		}
+	}()
+
 	<-ctx.Done()
+	ticker.Stop()
 	lgr.Infof("shutting down server")
 }

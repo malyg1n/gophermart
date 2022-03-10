@@ -60,3 +60,20 @@ func (s *Storage) UpdateOrder(ctx context.Context, number, status string, accrua
 
 	return err
 }
+
+// GetProcessOrders returns orders, which has status NEW or PROCESSING
+func (s Storage) GetProcessOrders(ctx context.Context) ([]model.Order, error) {
+	var orders []model.Order
+	var dbOrders []dbModel.Order
+
+	err := s.db.SelectContext(ctx, &dbOrders, "select * from orders where status in ('NEW', 'PROCESSING')")
+	if err != nil {
+		return nil, err
+	}
+
+	for _, o := range dbOrders {
+		orders = append(orders, o.ToCanonical())
+	}
+
+	return orders, nil
+}

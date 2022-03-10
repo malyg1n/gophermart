@@ -18,6 +18,7 @@ type OrderStorer interface {
 	GetOrderByNumber(ctx context.Context, number string) (*model.Order, error)
 	GetOrdersByUser(ctx context.Context, userID uint64) ([]model.Order, error)
 	UpdateOrder(ctx context.Context, number, status string, accrual int) error
+	GetProcessOrders(ctx context.Context) ([]model.Order, error)
 }
 
 // TransactionStorer interface for operations with transactions.

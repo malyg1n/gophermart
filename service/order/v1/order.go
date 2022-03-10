@@ -74,7 +74,7 @@ func (s OrderService) CreateOrder(ctx context.Context, number string, userID uin
 		return errs.ErrOrderExists
 	}
 
-	go s.processOrder(number, userID)
+	go s.processOrder(number, userID, "NEW")
 
 	return s.orderStorage.CreateOrder(ctx, number, userID)
 }
@@ -109,17 +109,30 @@ func (s *OrderService) updateOrder(ctx context.Context, number, status string, a
 	return err
 }
 
+// ProcessOrders check orders in accrual system.
+func (s OrderService) ProcessOrders() {
+	orders, err := s.orderStorage.GetProcessOrders(context.Background())
+	if err != nil {
+		s.logger.Errorf("%v", err)
+		return
+	}
+
+	for _, order := range orders {
+		go s.processOrder(order.Number, order.UserID, order.Status)
+	}
+}
+
 // processOrder check order in accrual system.
-func (s OrderService) processOrder(orderID string, userID uint64) {
+func (s OrderService) processOrder(orderID string, userID uint64, status string) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
 	defer cancel()
 
-	status := "NEW"
 	order, err := s.provider.CheckOrder(orderID)
 	if err != nil {
 		s.logger.Errorf("%v", err)
 		return
 	}
+
 	if status != order.Status {
 		status = order.Status
 		s.logger.Infof("update order %s, status=%s, accrual=%v", order.Number, order.Status, order.Accrual)
