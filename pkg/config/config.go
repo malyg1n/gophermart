@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -23,38 +22,33 @@ const (
 
 var instance *AppConfig
 
-// GetConfig return an instance of AppConfig.
-func GetConfig() (*AppConfig, error) {
-	if instance != nil {
-		return instance, nil
-	}
-
+func init() {
 	viper.AutomaticEnv()
 	pflag.StringP(dbURIName, "d", "", "database connection string")
 	pflag.StringP(RunAddrName, "a", "localhost:8080", "run address")
 	pflag.StringP(AccrualAddrName, "r", "http://localhost:8081", "accrual system address")
 	pflag.StringP(AppSecretName, "k", "app-secret-key", "secret key for app")
+}
+
+// NewDefaultConfig return an instance of AppConfig.
+func NewDefaultConfig() (*AppConfig, error) {
+	if instance != nil {
+		return instance, nil
+	}
+
 	pflag.Parse()
+
 	err := viper.BindPFlags(pflag.CommandLine)
+
 	if err != nil {
-		return nil, fmt.Errorf("parsing flag error %w", err)
+		return nil, err
 	}
 
-	dbURI := viper.GetString(dbURIName)
-	runAddr := viper.GetString(RunAddrName)
-	accrualAddr := viper.GetString(AccrualAddrName)
-	appSecret := viper.GetString(AppSecretName)
-
-	if appSecret == "" {
-		appSecret = "very-secret-key"
-	}
-
-	instance = &AppConfig{
-		RunAddress:     runAddr,
-		DatabaseURI:    dbURI,
-		AccrualAddress: accrualAddr,
-		AppSecret:      appSecret,
-	}
+	instance := &AppConfig{}
+	instance.RunAddress = viper.GetString(RunAddrName)
+	instance.DatabaseURI = viper.GetString(dbURIName)
+	instance.AccrualAddress = viper.GetString(AccrualAddrName)
+	instance.AppSecret = viper.GetString(AppSecretName)
 
 	return instance, nil
 }

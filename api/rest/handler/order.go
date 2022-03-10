@@ -14,7 +14,7 @@ import (
 func (h Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	userID, ok := ctx.Value(contexts.ContextUserKey).(int)
+	userID, ok := ctx.Value(contexts.ContextUserKey).(uint64)
 	if !ok {
 		http.Error(w, "failing with user context", http.StatusInternalServerError)
 		return
@@ -53,7 +53,7 @@ func (h Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 func (h Handler) GetOrdersByUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	userID, ok := ctx.Value(contexts.ContextUserKey).(int)
+	userID, ok := ctx.Value(contexts.ContextUserKey).(uint64)
 	if !ok {
 		http.Error(w, "failing with user context", http.StatusInternalServerError)
 		return

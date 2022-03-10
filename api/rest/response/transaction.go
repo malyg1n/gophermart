@@ -10,10 +10,10 @@ type Transaction struct {
 }
 
 // TransactionFromCanonical converts base model to response model.
-func TransactionFromCanonical(t *model.Transaction) Transaction {
+func TransactionFromCanonical(t model.Transaction) Transaction {
 	return Transaction{
 		Order:       t.OrderID,
-		Sum:         t.Amount * -1.0,
+		Sum:         float64(t.Amount) / float64(100) * -1.0,
 		ProcessedAt: t.CreatedAt,
 	}
 }

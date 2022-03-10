@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"gophermart/pkg/contexts"
-	"gophermart/pkg/logger"
 	"gophermart/pkg/token"
 	"net/http"
 	"strings"
@@ -28,11 +27,10 @@ func Auth(next http.Handler) http.Handler {
 		userClaims, err := token.GetClaimsByToken(tokenString)
 		if err != nil {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
-			logger.GetLogger().Error(err)
 			return
 		}
 
-		if userClaims.ExpiresAT < time.Now().Local().Unix() {
+		if userClaims.ExpiresAt < time.Now().Local().Unix() {
 			http.Error(w, "token expired", http.StatusUnauthorized)
 			return
 		}

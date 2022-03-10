@@ -10,7 +10,7 @@ func TestGetConfig(t *testing.T) {
 	t.Setenv(strings.ToUpper(dbURIName), "fake-db-dsn")
 	t.Setenv(strings.ToUpper(RunAddrName), "fake-addr")
 	t.Setenv(strings.ToUpper(AccrualAddrName), "fake-accrual")
-	got, err := GetConfig()
+	got, err := NewDefaultConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, "fake-db-dsn", got.DatabaseURI)
 	assert.Equal(t, "fake-addr", got.RunAddress)

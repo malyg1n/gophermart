@@ -3,8 +3,8 @@ package model
 // Order base model.
 type Order struct {
 	Number     string
-	UserID     int
+	UserID     uint64
 	Status     string
-	Accrual    float64
+	Accrual    int
 	UploadedAT string
 }

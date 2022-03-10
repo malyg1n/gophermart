@@ -1,4 +1,4 @@
-package accrual
+package model
 
 import "gophermart/model"
 
@@ -14,6 +14,6 @@ func (o Order) ToCanonical() *model.Order {
 	return &model.Order{
 		Number:  o.Order,
 		Status:  o.Status,
-		Accrual: o.Accrual,
+		Accrual: int(o.Accrual * 100),
 	}
 }

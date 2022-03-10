@@ -6,8 +6,9 @@ import (
 	"gophermart/pkg/config"
 	"gophermart/pkg/logger"
 	"gophermart/pkg/token"
-	"gophermart/provider/accrual"
-	v1 "gophermart/service/v1"
+	"gophermart/provider/accrual/fake"
+	orderService "gophermart/service/order/v1"
+	userService "gophermart/service/user/v1"
 	"gophermart/storage"
 	"gophermart/storage/pgsql"
 	"io"
@@ -19,34 +20,35 @@ import (
 type Suite struct {
 	suite.Suite
 	handler *Handler
-	us      storage.IUserStorage
-	os      storage.IOrderStorage
-	ts      storage.ITransactionStorage
+	us      storage.UserStorer
+	os      storage.OrderStorer
+	ts      storage.TransactionStorer
 }
 
 func (s *Suite) SetupTest() {
-	cfg, _ := config.GetConfig()
+	cfg, err := config.NewDefaultConfig()
+	require.NoError(s.T(), err)
 	cfg.DatabaseURI = "postgres://forge:secret@localhost:54321/gophermart?sslmode=disable"
-	st, _ := pgsql.NewStorage(cfg)
+	st, _ := pgsql.NewStorage(cfg.DatabaseURI)
 	st.Truncate()
 
-	lgr := logger.GetLogger()
-	accrualProvider := accrual.NewFakeHTTProvider()
+	lgr := logger.NewDefaultLogger()
+	accrualProvider := fake.NewFakeHTTProvider()
 
-	us := v1.NewUserService(
-		v1.WithUserStorageUserOption(st),
-		v1.WithTransactionStorageUserOption(st),
-		v1.WithLoggerUserOption(lgr),
+	us := userService.NewUserService(
+		userService.WithUserStorageUserOption(st),
+		userService.WithTransactionStorageUserOption(st),
+		userService.WithLoggerUserOption(lgr),
 	)
 
-	os := v1.NewOrderService(
-		v1.WithOrderStorageOrderOption(st),
-		v1.WithTransactionStorageOrderOption(st),
-		v1.WithLoggerOrderOption(lgr),
-		v1.WithProviderOrderOption(accrualProvider),
+	ose := orderService.NewOrderService(
+		orderService.WithOrderStorageOrderOption(st),
+		orderService.WithTransactionStorageOrderOption(st),
+		orderService.WithLoggerOrderOption(lgr),
+		orderService.WithProviderOrderOption(accrualProvider),
 	)
 
-	s.handler = NewHandler(WithUserService(us), WithOrderService(os), WithLogger(lgr))
+	s.handler = NewHandler(WithUserService(us), WithOrderService(ose), WithLogger(lgr))
 	s.us = st
 	s.os = st
 	s.ts = st
@@ -72,7 +74,7 @@ func (s *Suite) testRequest(method, path string, payload io.Reader, headers map[
 	return resp
 }
 
-func (s *Suite) getAuthHeader(userID int) map[string]string {
+func (s *Suite) getAuthHeader(userID uint64) map[string]string {
 	tkn, err := token.CreateTokenByUserID(userID)
 	require.NoError(s.T(), err)
 

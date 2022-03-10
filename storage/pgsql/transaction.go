@@ -7,15 +7,15 @@ import (
 )
 
 // GetOutcomeTransactionsByUser returns outcome transactions bu user.
-func (s *Storage) GetOutcomeTransactionsByUser(ctx context.Context, userID int) ([]*model.Transaction, error) {
-	dbTrans := make([]*dbModel.Transaction, 0)
+func (s Storage) GetOutcomeTransactionsByUser(ctx context.Context, userID uint64) ([]model.Transaction, error) {
+	dbTrans := make([]dbModel.Transaction, 0)
 
 	err := s.db.SelectContext(ctx, &dbTrans, "select * from transactions where user_id = $1 and amount < 0", userID)
 	if err != nil {
 		return nil, err
 	}
 
-	trans := make([]*model.Transaction, 0, len(dbTrans))
+	trans := make([]model.Transaction, 0, len(dbTrans))
 	for _, t := range dbTrans {
 		trans = append(trans, t.ToCanonical())
 	}
@@ -24,8 +24,13 @@ func (s *Storage) GetOutcomeTransactionsByUser(ctx context.Context, userID int) 
 }
 
 // SaveTransaction creates new transaction
-func (s *Storage) SaveTransaction(ctx context.Context, userID int, orderID string, amount float64) error {
-	_, err := s.db.ExecContext(
+func (s Storage) SaveTransaction(ctx context.Context, userID uint64, orderID string, amount int) error {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(
 		ctx,
 		"insert into transactions (user_id, order_id, amount) values ($1, $2, $3)",
 		userID,
@@ -37,23 +42,19 @@ func (s *Storage) SaveTransaction(ctx context.Context, userID int, orderID strin
 		return err
 	}
 
-	return s.updateUserBalance(ctx, userID, amount)
-}
-
-// updateUserBalance update user balance.
-func (s *Storage) updateUserBalance(ctx context.Context, userID int, amount float64) error {
-	_, err := s.db.ExecContext(
+	_, err = tx.ExecContext(
 		ctx,
 		"update users set balance = balance + $1 where id = $2",
 		amount,
 		userID,
 	)
+
 	if err != nil {
 		return err
 	}
 
 	if amount < 0 {
-		_, err := s.db.ExecContext(
+		_, err = tx.ExecContext(
 			ctx,
 			"update users set outcome = outcome - $1 where id = $2",
 			amount,
@@ -64,5 +65,5 @@ func (s *Storage) updateUserBalance(ctx context.Context, userID int, amount floa
 		}
 	}
 
-	return nil
+	return tx.Commit()
 }
