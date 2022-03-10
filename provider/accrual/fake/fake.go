@@ -1,20 +1,20 @@
-package accrual
+package fake
 
 import (
 	"gophermart/model"
 )
 
-// FakeHTTProvider struct.
-type FakeHTTProvider struct {
+// HTTPProvider struct.
+type HTTPProvider struct {
 }
 
 // NewFakeHTTProvider struct.
-func NewFakeHTTProvider() FakeHTTProvider {
-	return FakeHTTProvider{}
+func NewFakeHTTProvider() HTTPProvider {
+	return HTTPProvider{}
 }
 
 // CheckOrder in accrual system.
-func (p FakeHTTProvider) CheckOrder(orderID string) (*model.Order, error) {
+func (p HTTPProvider) CheckOrder(orderID string) (*model.Order, error) {
 	var status string
 	var accrual float64
 	switch orderID {

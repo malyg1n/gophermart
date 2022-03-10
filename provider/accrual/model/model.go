@@ -1,4 +1,4 @@
-package accrual
+package model
 
 import "gophermart/model"
 

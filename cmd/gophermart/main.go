@@ -6,7 +6,7 @@ import (
 	"gophermart/api/rest/handler"
 	"gophermart/pkg/config"
 	"gophermart/pkg/logger"
-	"gophermart/provider/accrual"
+	accrualHTTPProvider "gophermart/provider/accrual/http"
 	orderService "gophermart/service/order/v1"
 	userService "gophermart/service/user/v1"
 	"gophermart/storage/pgsql"
@@ -26,7 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	accrualProvider := accrual.NewAccrualHTTPProvider(cfg.AccrualAddress)
+	accrualProvider := accrualHTTPProvider.NewAccrualHTTPProvider(cfg.AccrualAddress)
 	stg, err := pgsql.NewStorage(cfg.DatabaseURI)
 
 	if err != nil {

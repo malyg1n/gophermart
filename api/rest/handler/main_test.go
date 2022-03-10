@@ -6,7 +6,7 @@ import (
 	"gophermart/pkg/config"
 	"gophermart/pkg/logger"
 	"gophermart/pkg/token"
-	"gophermart/provider/accrual"
+	"gophermart/provider/accrual/fake"
 	orderService "gophermart/service/order/v1"
 	userService "gophermart/service/user/v1"
 	"gophermart/storage"
@@ -33,7 +33,7 @@ func (s *Suite) SetupTest() {
 	st.Truncate()
 
 	lgr := logger.NewDefaultLogger()
-	accrualProvider := accrual.NewFakeHTTProvider()
+	accrualProvider := fake.NewFakeHTTProvider()
 
 	us := userService.NewUserService(
 		userService.WithUserStorageUserOption(st),

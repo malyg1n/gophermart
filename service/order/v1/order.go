@@ -7,7 +7,7 @@ import (
 	"gophermart/pkg/errs"
 	"gophermart/pkg/logger"
 	"gophermart/pkg/validation"
-	"gophermart/provider/accrual"
+	"gophermart/provider"
 	"gophermart/storage"
 	"time"
 )
@@ -17,7 +17,7 @@ type OrderService struct {
 	orderStorage       storage.OrderStorer
 	transactionStorage storage.TransactionStorer
 	logger             logger.Logger
-	provider           accrual.IAccrualProvider
+	provider           provider.AccrualProvider
 }
 
 type OrderOption func(service *OrderService)
@@ -55,7 +55,7 @@ func WithLoggerOrderOption(l logger.Logger) OrderOption {
 }
 
 // WithProviderOrderOption option.
-func WithProviderOrderOption(p accrual.IAccrualProvider) OrderOption {
+func WithProviderOrderOption(p provider.AccrualProvider) OrderOption {
 	return func(service *OrderService) {
 		service.provider = p
 	}
