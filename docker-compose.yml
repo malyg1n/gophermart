@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+
+  db:
+    image: postgres:latest
+    restart: on-failure
+    environment:
+      POSTGRES_USER: forge
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: gophermart
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "${PG_DEV_PORT}:5432"
+
+  db-test:
+    image: postgres:latest
+    restart: on-failure
+    environment:
+      POSTGRES_USER: forge
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: gophermart
+    volumes:
+      - ./data/db-test:/var/lib/postgresql/data
+    ports:
+      - "${PG_TEST_PORT}:5432"
